@@ -1,0 +1,13 @@
+app/
+├── Domain/
+│   └── Product/
+│       ├── Models/
+│       ├── Services/
+│       ├── DTOs/
+│       ├── Repositories/
+│       ├── Events/
+│       └── Validators/
+├── Http/
+│   └── Controllers/
+└── Infrastructure/
+    └── Database/ 
