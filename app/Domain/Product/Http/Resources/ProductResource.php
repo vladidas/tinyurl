@@ -7,6 +7,14 @@ namespace App\Domain\Product\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @property int id
+ * @property string name
+ * @property string description
+ * @property float price
+ * @property string created_at
+ * @property string updated_at
+ */
 class ProductResource extends JsonResource
 {
     public function toArray(Request $request): array
@@ -20,4 +28,4 @@ class ProductResource extends JsonResource
             'updated_at' => $this->updated_at,
         ];
     }
-} 
+}

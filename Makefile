@@ -1,4 +1,4 @@
-.PHONY: help up down restart build shell test migrate fresh seed npm-install npm-dev npm-build composer-install composer-update dev prod install-vue watch test test-unit test-feature test-filter test-coverage test-parallel test-stop
+.PHONY: help up down restart build shell test migrate fresh seed npm-install npm-dev npm-build composer-install composer-update dev prod install-vue watch test test-unit test-feature test-filter test-coverage test-parallel test-stop psalm psalm-dry psalm-fix
 
 # Default target
 help:
@@ -28,6 +28,9 @@ help:
 	@echo "  make test-coverage    - Run tests with coverage report"
 	@echo "  make test-parallel    - Run tests in parallel"
 	@echo "  make test-stop        - Run tests and stop on first failure"
+	@echo "  make psalm            - Run Psalm static analysis"
+	@echo "  make psalm-dry        - Run Psalm without making changes"
+	@echo "  make psalm-fix        - Run Psalm with automatic fixes"
 
 # Container commands
 up:
@@ -121,3 +124,13 @@ test-parallel:
 # Run tests and stop on first failure
 test-stop:
 	php artisan test --stop-on-failure
+
+# Psalm commands
+psalm:
+	./vendor/bin/sail php ./vendor/bin/psalm
+
+psalm-dry:
+	./vendor/bin/sail php ./vendor/bin/psalm --dry-run
+
+psalm-fix:
+	./vendor/bin/sail php ./vendor/bin/psalm --alter --issues=all

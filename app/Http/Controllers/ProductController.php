@@ -5,28 +5,32 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Domain\Product\DTOs\ProductDTO;
-use App\Domain\Product\Services\ProductService;
+use App\Domain\Product\Models\Product;
+use App\Domain\Product\Services\CreateProductService;
+use App\Domain\Product\Services\ListProductsService;
+use App\Domain\Product\Services\UpdateProductService;
+use App\Domain\Product\Services\DeleteProductService;
+use App\Domain\Product\Services\ShowProductService;
 use App\Http\Requests\CreateProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Domain\Product\Http\Resources\ProductResource;
 use App\Domain\Product\Http\Resources\ProductCollection;
-use Illuminate\Http\Response;
-use App\Domain\Product\Services\ProductPreviewService;
-use App\Domain\Product\Services\ProductViewHistoryService;
 use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 
 class ProductController extends Controller
 {
     public function __construct(
-        private readonly ProductService $productService,
-        private readonly ProductPreviewService $previewService,
-        private readonly ProductViewHistoryService $historyService
+        private readonly CreateProductService $createProduct,
+        private readonly ListProductsService $listProducts,
+        private readonly UpdateProductService $updateProduct,
+        private readonly DeleteProductService $deleteProduct,
+        private readonly ShowProductService $showProduct
     ) {}
 
     public function store(CreateProductRequest $request): ProductResource
     {
-        $product = $this->productService->createProduct(
+        $product = $this->createProduct->execute(
             ProductDTO::fromArray($request->validated())
         );
 
@@ -35,47 +39,32 @@ class ProductController extends Controller
 
     public function index(): ProductCollection
     {
-        $products = $this->productService->getProducts();
+        $products = $this->listProducts->execute();
 
         return new ProductCollection($products);
     }
 
-    public function update(UpdateProductRequest $request, int $id): ProductResource
+    public function update(UpdateProductRequest $request, Product $product): ProductResource
     {
-        $product = $this->productService->updateProduct(
-            $id,
+        $product = $this->updateProduct->execute(
+            $product,
             ProductDTO::fromArray($request->validated())
         );
 
         return new ProductResource($product);
     }
 
-    public function destroy(int $id): Response
+    public function destroy(Product $product): Response
     {
-        $this->productService->deleteProduct($id);
+        $this->deleteProduct->execute($product);
 
         return response()->noContent();
     }
 
-    public function toggleTop(int $id): ProductResource
+    public function show(Product $product, Request $request): ProductResource
     {
-        $product = $this->productService->toggleTop($id);
-        return new ProductResource($product);
-    }
+        $data = $this->showProduct->execute($product, $request->user()->id);
 
-    public function show(int $id, Request $request): JsonResponse
-    {
-        $product = $this->productService->findById($id);
-        
-        if (!$product) {
-            return response()->json(['message' => 'Product not found'], 404);
-        }
-
-        $preview = $this->previewService->getPreview($product, $request->user()->id);
-        
-        return response()->json([
-            'data' => $preview,
-            'recently_viewed' => $this->historyService->getHistory($request->user()->id),
-        ]);
+        return new ProductResource($data);
     }
 }

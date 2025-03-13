@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
+use App\Domain\Product\Models\Product;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateProductRequest extends FormRequest
@@ -16,9 +17,9 @@ class UpdateProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['sometimes', 'required', 'string', 'max:255'],
-            'description' => ['sometimes', 'nullable', 'string'],
-            'price' => ['sometimes', 'required', 'numeric', 'min:0', 'max:999999.99'],
+            Product::NAME => ['sometimes', 'required', 'string', 'max:255'],
+            Product::DESCRIPTION => ['sometimes', 'nullable', 'string'],
+            Product::PRICE => ['sometimes', 'required', 'numeric', 'min:0', 'max:999999.99'],
         ];
     }
-} 
+}

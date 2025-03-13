@@ -7,6 +7,13 @@ namespace App\Domain\Product\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
+/**
+ * @property mixed collection
+ * @property mixed total
+ * @property mixed perPage
+ * @property mixed currentPage
+ * @property mixed lastPage
+ */
 class ProductCollection extends ResourceCollection
 {
     public function toArray(Request $request): array
@@ -21,4 +28,4 @@ class ProductCollection extends ResourceCollection
             ],
         ];
     }
-} 
+}
