@@ -1,4 +1,4 @@
-.PHONY: help up down restart build shell test migrate fresh seed npm-install npm-dev npm-build composer-install composer-update dev prod install-vue watch test test-unit test-feature test-filter test-coverage test-parallel test-stop psalm psalm-dry psalm-fix
+.PHONY: help up down restart build shell test migrate fresh seed npm-install npm-dev npm-build composer-install composer-update dev prod install-vue watch test test-unit test-feature test-filter test-coverage test-parallel test-stop psalm psalm-dry psalm-fix watch-poll dev-server dev install-deps serve clean
 
 # Default target
 help:
@@ -31,6 +31,13 @@ help:
 	@echo "  make psalm            - Run Psalm static analysis"
 	@echo "  make psalm-dry        - Run Psalm without making changes"
 	@echo "  make psalm-fix        - Run Psalm with automatic fixes"
+	@echo "  make watch-poll       - Run Vite dev server with polling"
+	@echo "  make dev-server       - Run Vite dev server"
+	@echo "  make dev              - Run NPM dev script"
+	@echo "  make prod             - Run NPM build script"
+	@echo "  make install-deps     - Install all dependencies"
+	@echo "  make serve            - Serve Laravel application"
+	@echo "  make clean            - Clean installation"
 
 # Container commands
 up:
@@ -81,7 +88,7 @@ install-vue:
 	./vendor/bin/sail npm install @vitejs/plugin-vue @inertiajs/vue3 @inertiajs/progress vue@^3.4.0 vue-router@4
 
 watch:
-	./vendor/bin/sail npm run watch 
+	./vendor/bin/sail npm run watch
 
 # Composer commands
 composer-install:
@@ -134,3 +141,31 @@ psalm-dry:
 
 psalm-fix:
 	./vendor/bin/sail php ./vendor/bin/psalm --alter --issues=all
+
+# Watch with polling (better for some environments)
+watch-poll:
+	npm run dev
+
+# Run Vite dev server
+dev-server:
+	npm run dev -- --host
+
+# Development setup with watching
+dev: install-deps
+	$(MAKE) -j2 serve watch
+
+# Install all dependencies
+install-deps: composer-install npm-install
+
+# Serve Laravel application
+serve:
+	php artisan serve
+
+# Clean and reinstall
+fresh: clean install-deps
+
+# Clean installation
+clean:
+	rm -rf node_modules
+	rm -rf vendor
+	rm -rf public/build

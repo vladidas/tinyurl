@@ -9,10 +9,12 @@ use App\Domain\Product\DTOs\ProductDTO;
 use App\Domain\Product\QueryBuilders\ProductQueryBuilder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 
 class ProductRepository
 {
+    private const CACHE_TTL = 3600; // 1 hour in seconds
+
     public function __construct(
         private readonly Product $model,
         private readonly ProductQueryBuilder $queryBuilder
@@ -26,6 +28,7 @@ class ProductRepository
             $product->categories()->sync($productDTO->categoryIds);
         }
 
+        $this->clearProductCache($product->getId());
         return $product->load(Product::CATEGORIES);
     }
 
@@ -35,21 +38,40 @@ class ProductRepository
         string $direction = 'desc',
         ?int $categoryId = null
     ): LengthAwarePaginator {
-        $cacheKey = "products:list:{$sortBy}:{$direction}:{$categoryId}:{$perPage}";
+        $key = "products:list:{$sortBy}:{$direction}:{$categoryId}:{$perPage}";
 
-        return Cache::remember($cacheKey, 60, function () use ($perPage, $sortBy, $direction, $categoryId) {
-            return $this->queryBuilder
-                ->onlyActive()
-                ->withCategories()
-                ->withCategory($categoryId)
-                ->sortBy($sortBy, $direction)
-                ->paginate($perPage);
-        });
+        $cached = Redis::get($key);
+        if ($cached) {
+            return unserialize($cached);
+        }
+
+        $paginator = $this->queryBuilder
+            ->onlyActive()
+            ->withCategories()
+            ->withCategory($categoryId)
+            ->sortBy($sortBy, $direction)
+            ->paginate($perPage);
+
+        Redis::setex($key, self::CACHE_TTL, serialize($paginator));
+
+        return $paginator;
     }
 
     public function findById(int $id): ?Product
     {
-        return $this->model->with(Product::CATEGORIES)->find($id);
+        $key = "product:{$id}";
+
+        $cached = Redis::get($key);
+        if ($cached) {
+            return unserialize($cached);
+        }
+
+        $product = $this->model->with(Product::CATEGORIES)->find($id);
+        if ($product) {
+            Redis::setex($key, self::CACHE_TTL, serialize($product));
+        }
+
+        return $product;
     }
 
     public function update(Product $product, ProductDTO $productDTO): Product
@@ -60,11 +82,13 @@ class ProductRepository
             $product->categories()->sync($productDTO->categoryIds);
         }
 
+        $this->clearProductCache($product->getId());
         return $product->refresh()->load(Product::CATEGORIES);
     }
 
     public function delete(Product $product): void
     {
+        $this->clearProductCache($product->getId());
         $product->delete();
     }
 
@@ -111,5 +135,20 @@ class ProductRepository
                 Product::PRICE,
                 Product::RATING
             ]);
+    }
+
+    private function clearProductCache(int $productId): void
+    {
+        Redis::del([
+            "product:{$productId}",
+            "product:data:{$productId}",
+            "product:related:{$productId}"
+        ]);
+
+        // Clear list cache using pattern
+        $keys = Redis::keys('products:list:*');
+        if (!empty($keys)) {
+            Redis::del($keys);
+        }
     }
 }

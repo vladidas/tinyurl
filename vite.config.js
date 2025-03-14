@@ -7,18 +7,8 @@ export default defineConfig({
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.js'],
             refresh: true,
-            watch: {
-                include: ['resources/**'],
-            }
         }),
-        vue({
-            template: {
-                transformAssetUrls: {
-                    base: null,
-                    includeAbsolute: false,
-                }
-            }
-        }),
+        vue()
     ],
     server: {
         hmr: {
@@ -26,6 +16,12 @@ export default defineConfig({
         },
         watch: {
             usePolling: true,
+            include: [
+                'resources/**',
+                'routes/**',
+                'config/**',
+                'app/**'
+            ]
         }
     }
 });

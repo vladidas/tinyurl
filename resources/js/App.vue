@@ -1,15 +1,45 @@
 <template>
-  <div id="app">
-    <nav>
-      <router-link to="/">Home12333</router-link> |
-      <router-link to="/about">About</router-link>
+  <div>
+    <nav class="bg-gray-800">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+          <div class="flex items-center">
+            <router-link to="/" class="text-white text-xl font-bold">
+              PMS
+            </router-link>
+            <div class="hidden md:block">
+              <div class="ml-10 flex items-baseline space-x-4">
+                <router-link
+                  to="/"
+                  class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                  :class="{ 'bg-gray-900 text-white': $route.path === '/' }"
+                >
+                  Home
+                </router-link>
+                <router-link
+                  to="/products"
+                  class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                  :class="{ 'bg-gray-900 text-white': $route.path === '/products' }"
+                >
+                  Products
+                </router-link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </nav>
-    <router-view/>
+
+    <main>
+      <router-view></router-view>
+    </main>
   </div>
 </template>
 
-<script setup>
-// Component logic here
+<script>
+export default {
+  name: 'App'
+}
 </script>
 
 <style>
@@ -36,4 +66,4 @@ nav a {
 nav a.router-link-exact-active {
   color: #42b983;
 }
-</style> 
+</style>

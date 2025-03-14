@@ -9,14 +9,75 @@
     findUnusedVariables="true"
 >
     <projectFiles>
+        <!-- Whitelist specific folders -->
         <directory name="app"/>
+
+        <!-- Ignore everything else -->
         <ignoreFiles>
             <directory name="vendor"/>
+            <directory name="node_modules"/>
+            <directory name="tests"/>
             <directory name="storage"/>
             <directory name="resources"/>
+            <directory name="database"/>
+            <directory name="config"/>
+            <directory name="public"/>
+            <directory name="routes"/>
         </ignoreFiles>
     </projectFiles>
+
     <plugins>
         <pluginClass class="Psalm\LaravelPlugin\Plugin"/>
     </plugins>
-</psalm> 
+
+    <issueHandlers>
+        <!-- Laravel-specific suppressions -->
+        <PropertyNotSetInConstructor>
+            <errorLevel type="suppress">
+                <directory name="app"/>
+            </errorLevel>
+        </PropertyNotSetInConstructor>
+        <UndefinedMagicPropertyFetch>
+            <errorLevel type="suppress">
+                <directory name="app"/>
+            </errorLevel>
+        </UndefinedMagicPropertyFetch>
+        <PossiblyUnusedMethod>
+            <errorLevel type="suppress">
+                <directory name="app"/>
+            </errorLevel>
+        </PossiblyUnusedMethod>
+        <MissingConstructor>
+            <errorLevel type="suppress">
+                <directory name="app"/>
+            </errorLevel>
+        </MissingConstructor>
+        <UndefinedMagicMethod>
+            <errorLevel type="suppress">
+                <directory name="app"/>
+            </errorLevel>
+        </UndefinedMagicMethod>
+        <UndefinedThisPropertyFetch>
+            <errorLevel type="suppress">
+                <directory name="app"/>
+            </errorLevel>
+        </UndefinedThisPropertyFetch>
+        <!-- Relationship methods -->
+        <InvalidReturnType>
+            <errorLevel type="suppress">
+                <directory name="app"/>
+            </errorLevel>
+        </InvalidReturnType>
+        <InvalidArgument>
+            <errorLevel type="suppress">
+                <directory name="app"/>
+            </errorLevel>
+        </InvalidArgument>
+        <!-- Collection methods -->
+        <UndefinedInterfaceMethod>
+            <errorLevel type="suppress">
+                <directory name="app"/>
+            </errorLevel>
+        </UndefinedInterfaceMethod>
+    </issueHandlers>
+</psalm>

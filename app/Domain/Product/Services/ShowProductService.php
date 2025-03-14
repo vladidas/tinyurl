@@ -6,11 +6,11 @@ namespace App\Domain\Product\Services;
 
 use App\Domain\Product\Models\Product;
 use App\Domain\Product\Repositories\ProductRepository;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 
 final class ShowProductService
 {
-    private const CACHE_TTL = 3600; // 1 hour
+    private const CACHE_TTL = 604800; // 7 days in seconds
 
     public function __construct(
         private readonly ProductRepository $repository,
@@ -30,24 +30,36 @@ final class ShowProductService
 
     private function getProductData(Product $product): array
     {
-        $cacheKey = "product:data:{$product->getId()}";
+        $key = "product:data:{$product->getId()}";
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($product) {
-            return $product->load('categories')->toArray();
-        });
+        $cached = Redis::get($key);
+        if ($cached) {
+            return json_decode($cached, true);
+        }
+
+        $data = $product->load(Product::CATEGORIES)->toArray();
+        Redis::setex($key, self::CACHE_TTL, json_encode($data));
+
+        return $data;
     }
 
     private function getRelatedProducts(Product $product): array
     {
-        $cacheKey = "product:related:{$product->getId()}";
+        $key = "product:related:{$product->getId()}";
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($product) {
-            return $this->repository->findRelatedProducts($product)->toArray();
-        });
+        $cached = Redis::get($key);
+        if ($cached) {
+            return json_decode($cached, true);
+        }
+
+        $data = $this->repository->findRelatedProducts($product)->toArray();
+        Redis::setex($key, self::CACHE_TTL, json_encode($data));
+
+        return $data;
     }
 
     private function getRecentlyViewed(int $userId): array
     {
         return $this->historyService->getHistory($userId);
     }
-} 
+}
