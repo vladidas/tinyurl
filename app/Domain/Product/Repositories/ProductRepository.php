@@ -38,12 +38,13 @@ class ProductRepository
         int $perPage = 15,
         string $sortBy = Product::CREATED_AT,
         string $direction = 'desc',
-        ?string $search = null
+        ?string $search = null,
+        bool $cacheResults = true
     ): LengthAwarePaginator {
         $key = "products:list:{$sortBy}:{$direction}:{$search}:{$perPage}:{$page}";
 
         $cached = Redis::get($key);
-        if ($cached) {
+        if ($cacheResults && $cached) {
             return unserialize($cached);
         }
 

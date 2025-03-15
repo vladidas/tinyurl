@@ -17,6 +17,7 @@ class ProductFactory extends Factory
             Product::NAME => $this->faker->words(3, true),
             Product::DESCRIPTION => $this->faker->paragraph(),
             Product::PRICE => $this->faker->randomFloat(2, 1, 1000),
+            Product::RATING => $this->faker->randomFloat(1, 1, 100),
         ];
     }
 }

@@ -38,6 +38,7 @@ class ProductDTOTest extends TestCase
             'name' => 'Test Product',
             'description' => 'Test Description',
             'price' => 99.99,
+            'rating' => 0,
         ], $array);
     }
 
@@ -51,4 +52,4 @@ class ProductDTOTest extends TestCase
 
         $this->assertNull($dto->description);
     }
-} 
+}
