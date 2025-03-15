@@ -34,12 +34,13 @@ class ProductRepository
     }
 
     public function paginate(
+        int $page = 1,
         int $perPage = 15,
         string $sortBy = Product::CREATED_AT,
         string $direction = 'desc',
         ?string $search = null
     ): LengthAwarePaginator {
-        $key = "products:list:{$sortBy}:{$direction}:{$search}:{$perPage}";
+        $key = "products:list:{$sortBy}:{$direction}:{$search}:{$perPage}:{$page}";
 
         $cached = Redis::get($key);
         if ($cached) {

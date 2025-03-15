@@ -42,6 +42,7 @@ class ProductController extends Controller
     public function index(ListProductRequest $request): ProductCollection
     {
         $products = $this->listProducts->execute(
+            page: $request->validated('page'),
             perPage: $request->validated('per_page'),
             sortBy: $request->validated('sort_by'),
             direction: $request->validated('direction'),

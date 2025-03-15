@@ -15,11 +15,12 @@ final readonly class ListProductsService
     ) {}
 
     public function execute(
+        int $page = 1,
         int $perPage = 15,
         string $sortBy = Product::CREATED_AT,
         string $direction = 'desc',
         ?string $search = null
     ): LengthAwarePaginator {
-        return $this->repository->paginate($perPage, $sortBy, $direction, $search);
+        return $this->repository->paginate($page, $perPage, $sortBy, $direction, $search);
     }
 }

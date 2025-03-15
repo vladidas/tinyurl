@@ -143,18 +143,18 @@
     <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 mt-4 rounded-lg shadow-sm">
       <div class="flex-1 flex justify-between sm:hidden">
         <button
-          @click="goToPage(products.meta?.current_page - 1)"
-          :disabled="products.meta?.current_page === 1"
+          @click="goToPage(products.meta.current_page - 1)"
+          :disabled="products.meta.current_page <= 1"
           class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-          :class="{ 'opacity-50 cursor-not-allowed': products.meta?.current_page === 1 }"
+          :class="{ 'opacity-50 cursor-not-allowed': products.meta.current_page <= 1 }"
         >
           Previous
         </button>
         <button
-          @click="goToPage(products.meta?.current_page + 1)"
-          :disabled="products.meta?.current_page === products.meta?.last_page"
+          @click="goToPage(products.meta.current_page + 1)"
+          :disabled="products.meta.current_page === products.meta.last_page"
           class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-          :class="{ 'opacity-50 cursor-not-allowed': products.meta?.current_page === products.meta?.last_page }"
+          :class="{ 'opacity-50 cursor-not-allowed': products.meta.current_page === products.meta.last_page }"
         >
           Next
         </button>
@@ -163,28 +163,54 @@
         <div>
           <p class="text-sm text-gray-700">
             Showing
-            <span class="font-medium">{{ products.meta?.from || 0 }}</span>
+            <span class="font-medium">
+              {{ products.data.length ? ((products.meta.current_page - 1) * products.meta.per_page) + 1 : 0 }}
+            </span>
             to
-            <span class="font-medium">{{ products.meta?.to || 0 }}</span>
+            <span class="font-medium">
+              {{ Math.min(products.meta.current_page * products.meta.per_page, products.meta.total) }}
+            </span>
             of
-            <span class="font-medium">{{ products.meta?.total || 0 }}</span>
+            <span class="font-medium">{{ products.meta.total }}</span>
             results
           </p>
         </div>
         <div>
-          <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+          <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
             <button
-              v-for="page in products.meta?.last_page"
+              @click="goToPage(products.meta.current_page - 1)"
+              :disabled="products.meta.current_page <= 1"
+              class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+              :class="{ 'opacity-50 cursor-not-allowed': products.meta.current_page <= 1 }"
+            >
+              <span class="sr-only">Previous</span>
+              <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+              </svg>
+            </button>
+            <button
+              v-for="page in getPageNumbers()"
               :key="page"
               @click="goToPage(page)"
               :class="[
-                'relative inline-flex items-center px-4 py-2 border text-sm font-medium',
-                page === products.meta?.current_page
+                page === products.meta.current_page
                   ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
-                  : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                  : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50',
+                'relative inline-flex items-center px-4 py-2 border text-sm font-medium'
               ]"
             >
               {{ page }}
+            </button>
+            <button
+              @click="goToPage(products.meta.current_page + 1)"
+              :disabled="products.meta.current_page >= products.meta.last_page"
+              class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+              :class="{ 'opacity-50 cursor-not-allowed': products.meta.current_page >= products.meta.last_page }"
+            >
+              <span class="sr-only">Next</span>
+              <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+              </svg>
             </button>
           </nav>
         </div>
@@ -266,11 +292,19 @@
 
 <script>
 import axios from 'axios';
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, watch } from 'vue';
 
 export default {
   setup() {
-    const products = ref({ data: [], meta: {} });
+    const products = ref({
+      data: [],
+      meta: {
+        current_page: 1,
+        per_page: 15,
+        total: 0,
+        last_page: 1
+      }
+    });
     const showModal = ref(false);
     const editingProduct = ref(null);
     const filters = reactive({
@@ -289,12 +323,40 @@ export default {
 
     const loadProducts = async () => {
       try {
+        // Ensure page is a valid number
+        if (!Number.isInteger(filters.page) || filters.page < 1) {
+          filters.page = 1;
+        }
+
         const response = await axios.get('/api/v1/products', {
-          params: filters
+          params: {
+            ...filters,
+            page: filters.page
+          }
         });
-        products.value = response.data;
+
+        // Ensure proper data structure
+        products.value = {
+          data: response.data.data || [],
+          meta: {
+            current_page: parseInt(response.data.meta.current_page, 10),
+            per_page: parseInt(response.data.meta.per_page, 10),
+            total: parseInt(response.data.meta.total, 10),
+            last_page: parseInt(response.data.meta.last_page, 10)
+          }
+        };
       } catch (error) {
         console.error('Error loading products:', error);
+        // Reset to default state on error
+        products.value = {
+          data: [],
+          meta: {
+            current_page: 1,
+            per_page: 15,
+            total: 0,
+            last_page: 1
+          }
+        };
       }
     };
 
@@ -355,10 +417,65 @@ export default {
       loadProducts();
     };
 
+    const getPageNumbers = () => {
+      if (!products.value.meta) return [];
+      
+      const currentPage = products.value.meta.current_page;
+      const lastPage = products.value.meta.last_page;
+      const delta = 2;
+      const range = [];
+      
+      for (
+        let i = Math.max(2, currentPage - delta);
+        i <= Math.min(lastPage - 1, currentPage + delta);
+        i++
+      ) {
+        range.push(i);
+      }
+      
+      if (currentPage - delta > 2) {
+        range.unshift('...');
+      }
+      if (currentPage + delta < lastPage - 1) {
+        range.push('...');
+      }
+      
+      if (lastPage > 1) {
+        range.unshift(1);
+        if (lastPage > 1) {
+          range.push(lastPage);
+        }
+      }
+      
+      return range;
+    };
+
     const goToPage = (page) => {
-      filters.page = page;
+      if (page === '...') return;
+      
+      // Convert to number and validate
+      const pageNum = parseInt(page, 10);
+      if (isNaN(pageNum) || !Number.isInteger(pageNum)) {
+        filters.page = 1;
+        loadProducts();
+        return;
+      }
+      
+      // Check bounds
+      const lastPage = parseInt(products.value.meta.last_page, 10) || 1;
+      const validPage = Math.max(1, Math.min(pageNum, lastPage));
+      
+      filters.page = validPage;
       loadProducts();
     };
+
+    watch(
+      () => [filters.search, filters.sort_by, filters.direction],
+      () => {
+        filters.page = 1;
+        loadProducts();
+      }
+    );
 
     onMounted(loadProducts);
 
@@ -375,6 +492,7 @@ export default {
       handleSubmit,
       deleteProduct,
       handleSearch,
+      getPageNumbers,
       goToPage
     };
   }
