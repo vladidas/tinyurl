@@ -8,7 +8,7 @@ use App\Domain\Product\DTOs\ProductDTO;
 use App\Domain\Product\Models\Product;
 use App\Domain\Product\Repositories\ProductRepository;
 
-final class CreateProductService
+final readonly class CreateProductService
 {
     public function __construct(
         private readonly ProductRepository $repository
@@ -18,4 +18,4 @@ final class CreateProductService
     {
         return $this->repository->create($productDTO);
     }
-} 
+}

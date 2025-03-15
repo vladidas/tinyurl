@@ -20,6 +20,9 @@ class UpdateProductRequest extends FormRequest
             Product::NAME => ['sometimes', 'required', 'string', 'max:255'],
             Product::DESCRIPTION => ['sometimes', 'nullable', 'string'],
             Product::PRICE => ['sometimes', 'required', 'numeric', 'min:0', 'max:999999.99'],
+            Product::RATING => ['sometimes', 'integer', 'min:0', 'max:100'],
+            Product::CATEGORY_IDS => ['sometimes', 'array'],
+            Product::CATEGORY_IDS . '.*' => ['exists:categories,id'],
         ];
     }
 }

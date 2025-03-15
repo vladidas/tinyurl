@@ -13,13 +13,15 @@ class GenerateProductsCommand extends Command
 
     protected $signature = 'products:generate {count=1000000}';
     protected $description = 'Generate large number of test products';
+    private const PROCESSING_MESSAGE = 'Generating %s products...';
+    private const SUCCESS_MESSAGE = 'Products generated successfully!';
 
     public function handle(): int
     {
         $count = (int) $this->argument('count');
         $bar = $this->output->createProgressBar($count);
 
-        $this->info("Generating {$count} products...");
+        $this->info(sprintf(self::PROCESSING_MESSAGE, $count));
 
         for ($i = 0; $i < $count; $i += self::CHUNK) {
             Product::factory()
@@ -31,7 +33,7 @@ class GenerateProductsCommand extends Command
 
         $bar->finish();
         $this->newLine();
-        $this->info('Products generated successfully!');
+        $this->info(self::SUCCESS_MESSAGE);
 
         return Command::SUCCESS;
     }

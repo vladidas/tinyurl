@@ -8,10 +8,10 @@ use App\Domain\Product\Models\Product;
 use App\Domain\Product\Repositories\ProductRepository;
 use Illuminate\Pagination\LengthAwarePaginator;
 
-final class ListProductsService
+final readonly class ListProductsService
 {
     public function __construct(
-        private readonly ProductRepository $repository
+        private ProductRepository $repository
     ) {}
 
     public function execute(
@@ -22,4 +22,4 @@ final class ListProductsService
     ): LengthAwarePaginator {
         return $this->repository->paginate($perPage, $sortBy, $direction, $categoryId);
     }
-} 
+}

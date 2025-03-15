@@ -25,8 +25,8 @@ class Category extends Model
     public const DELETED_AT = 'deleted_at';
 
     protected $fillable = [
-        'name',
-        'description',
+        self::NAME,
+        self::DESCRIPTION,
     ];
 
     public function products(): BelongsToMany

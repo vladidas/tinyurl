@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\Product\Models;
 
 use App\Domain\Category\Models\Category;
+use Carbon\Carbon;
 use Database\Factories\ProductFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -38,15 +39,15 @@ class Product extends Model
     public const CATEGORIES = 'categories';
 
     protected $fillable = [
-        'name',
-        'description',
-        'price',
-        'rating',
+        self::NAME,
+        self::DESCRIPTION,
+        self::PRICE,
+        self::RATING,
     ];
 
     protected $casts = [
-        'price' => 'float',
-        'rating' => 'integer',
+        self::PRICE => 'float',
+        self::RATING => 'integer',
     ];
 
     public function categories(): BelongsToMany
@@ -57,6 +58,36 @@ class Product extends Model
     public function getId(): int
     {
         return $this->id;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
+
+    public function getPrice(): float
+    {
+        return $this->price;
+    }
+
+    public function getRating(): int
+    {
+        return $this->rating;
+    }
+
+    public function getCreatedAt(): Carbon
+    {
+        return $this->created_at;
+    }
+
+    public function getUpdatedAt(): Carbon
+    {
+        return $this->updated_at;
     }
 
     protected static function newFactory(): ProductFactory

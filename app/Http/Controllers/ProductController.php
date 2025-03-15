@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Domain\Product\DTOs\ProductDTO;
+use App\Domain\Product\Http\Resources\ShowProductResource;
 use App\Domain\Product\Models\Product;
 use App\Domain\Product\Services\CreateProductService;
 use App\Domain\Product\Services\ListProductsService;
@@ -61,10 +62,10 @@ class ProductController extends Controller
         return response()->noContent();
     }
 
-    public function show(Product $product, Request $request): ProductResource
+    public function show(Product $product, Request $request): ShowProductResource
     {
         $data = $this->showProduct->execute($product, $request->user()->id);
 
-        return new ProductResource($data);
+        return new ShowProductResource($data);
     }
 }

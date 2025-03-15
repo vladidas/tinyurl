@@ -76,7 +76,12 @@
               class="hover:bg-gray-50 transition-colors duration-150"
             >
               <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm font-medium text-gray-900">{{ product.name }}</div>
+                <router-link 
+                  :to="{ name: 'product-show', params: { id: product.id }}"
+                  class="text-sm font-medium text-indigo-600 hover:text-indigo-900"
+                >
+                  {{ product.name }}
+                </router-link>
               </td>
               <td class="px-6 py-4">
                 <div class="text-sm text-gray-500 line-clamp-2">{{ product.description }}</div>

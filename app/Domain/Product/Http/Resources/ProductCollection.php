@@ -6,13 +6,14 @@ namespace App\Domain\Product\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Support\Collection;
 
 /**
- * @property mixed collection
- * @property mixed total
- * @property mixed perPage
- * @property mixed currentPage
- * @property mixed lastPage
+ * @property Collection collection
+ * @method int total()
+ * @method int perPage()
+ * @method int currentPage()
+ * @method int lastPage()
  */
 class ProductCollection extends ResourceCollection
 {

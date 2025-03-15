@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Product\Repositories;
 
+use App\Domain\Category\Models\Category;
 use App\Domain\Product\Models\Product;
 use App\Domain\Product\DTOs\ProductDTO;
 use App\Domain\Product\QueryBuilders\ProductQueryBuilder;
@@ -122,8 +123,8 @@ class ProductRepository
         return $this->model
             ->whereHas(Product::CATEGORIES, function ($query) use ($product) {
                 $query->whereIn(
-                    sprintf('%s.%s', Product::CATEGORIES, 'id'),
-                    $product->categories->pluck('id')
+                    sprintf('%s.%s', Product::CATEGORIES, Category::ID),
+                    $product->categories->pluck(Category::ID)
                 );
             })
             ->where(Product::ID, '!=', $product->getId())

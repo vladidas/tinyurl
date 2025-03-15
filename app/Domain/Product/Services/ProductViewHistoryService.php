@@ -7,7 +7,7 @@ namespace App\Domain\Product\Services;
 use App\Domain\Product\Models\Product;
 use Illuminate\Support\Facades\Redis;
 
-class ProductViewHistoryService
+final readonly class ProductViewHistoryService
 {
     private const HISTORY_KEY = 'user:%d:product_history';
     private const MAX_HISTORY = 10;
@@ -17,7 +17,7 @@ class ProductViewHistoryService
         $key = sprintf(self::HISTORY_KEY, $userId);
 
         Redis::pipeline(function ($pipe) use ($key, $product) {
-            $pipe->lpush($key, $product->id);
+            $pipe->lpush($key, $product->getId());
             $pipe->ltrim($key, 0, self::MAX_HISTORY - 1);
             $pipe->expire($key, 60 * 60 * 24 * 7); // 7 days
         });

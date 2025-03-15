@@ -8,7 +8,7 @@ use App\Domain\Product\Models\Product;
 use App\Domain\Product\Repositories\ProductRepository;
 use Illuminate\Support\Facades\Redis;
 
-final class ShowProductService
+final readonly class ShowProductService
 {
     private const CACHE_TTL = 604800; // 7 days in seconds
 
