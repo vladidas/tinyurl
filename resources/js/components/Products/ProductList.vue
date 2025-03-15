@@ -3,7 +3,7 @@
     <!-- Header -->
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-2xl font-bold text-gray-800">Products</h1>
-      <button 
+      <button
         @click="openCreateModal"
         class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors duration-200"
       >
@@ -34,8 +34,8 @@
           </div>
         </div>
         <div class="flex gap-4">
-          <select 
-            v-model="filters.sortBy"
+          <select
+            v-model="filters.sort_by"
             class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
             @change="loadProducts"
           >
@@ -44,7 +44,7 @@
             <option value="price">Price</option>
             <option value="rating">Rating</option>
           </select>
-          <select 
+          <select
             v-model="filters.direction"
             class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
             @change="loadProducts"
@@ -70,13 +70,13 @@
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            <tr 
-              v-for="product in products.data" 
+            <tr
+              v-for="product in products.data"
               :key="product.id"
               class="hover:bg-gray-50 transition-colors duration-150"
             >
               <td class="px-6 py-4 whitespace-nowrap">
-                <router-link 
+                <router-link
                   :to="{ name: 'product-show', params: { id: product.id }}"
                   class="text-sm font-medium text-indigo-600 hover:text-indigo-900"
                 >
@@ -106,7 +106,7 @@
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-center">
                 <div class="flex items-center justify-center space-x-3">
-                  <button 
+                  <button
                     @click="openEditModal(product)"
                     class="text-indigo-600 hover:text-indigo-900 transition-colors duration-200"
                   >
@@ -114,7 +114,7 @@
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                     </svg>
                   </button>
-                  <button 
+                  <button
                     @click="deleteProduct(product.id)"
                     class="text-red-600 hover:text-red-900 transition-colors duration-200"
                   >
@@ -275,7 +275,7 @@ export default {
     const editingProduct = ref(null);
     const filters = reactive({
       search: '',
-      sortBy: 'created_at',
+      sort_by: 'created_at',
       direction: 'desc',
       page: 1
     });
@@ -341,7 +341,7 @@ export default {
 
     const deleteProduct = async (id) => {
       if (!confirm('Are you sure you want to delete this product?')) return;
-      
+
       try {
         await axios.delete(`/api/v1/products/${id}`);
         loadProducts();
@@ -388,4 +388,4 @@ export default {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-</style> 
+</style>

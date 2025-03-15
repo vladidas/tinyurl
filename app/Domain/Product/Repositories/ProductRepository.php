@@ -37,9 +37,9 @@ class ProductRepository
         int $perPage = 15,
         string $sortBy = Product::CREATED_AT,
         string $direction = 'desc',
-        ?int $categoryId = null
+        ?string $search = null
     ): LengthAwarePaginator {
-        $key = "products:list:{$sortBy}:{$direction}:{$categoryId}:{$perPage}";
+        $key = "products:list:{$sortBy}:{$direction}:{$search}:{$perPage}";
 
         $cached = Redis::get($key);
         if ($cached) {
@@ -49,7 +49,7 @@ class ProductRepository
         $paginator = $this->queryBuilder
             ->onlyActive()
             ->withCategories()
-            ->withCategory($categoryId)
+            ->search($search)
             ->sortBy($sortBy, $direction)
             ->paginate($perPage);
 

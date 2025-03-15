@@ -33,6 +33,20 @@ class ProductQueryBuilder
         return $this;
     }
 
+    public function search(?string $keyword): self
+    {
+        if (empty($keyword)) {
+            return $this;
+        }
+
+        return $this->query->where(function (Builder $query) use ($keyword) {
+            $searchTerm = '%' . strtolower($keyword) . '%';
+
+            $query->where(Product::NAME, 'LIKE', $searchTerm)
+                ->orWhere(Product::DESCRIPTION, 'LIKE', $searchTerm);
+        });
+    }
+
     public function withCategories(): self
     {
         $this->query->with(sprintf('%s:%s,%s', Product::CATEGORIES, Category::ID, Category::NAME));
@@ -46,19 +60,6 @@ class ProductQueryBuilder
 
     public function sortBy(string $field, string $direction = 'asc'): self
     {
-        if ($field === 'category') {
-            $this->query->orderBy(function ($query) use ($direction) {
-                $query->select('categories.name')
-                    ->from(Product::CATEGORIES)
-                    ->join('category_product', 'categories.id', '=', 'category_product.category_id')
-                    ->whereColumn('category_product.product_id', 'products.id')
-                    ->orderBy(sprintf('%s.%s', Product::CATEGORIES, Category::NAME), $direction)
-                    ->limit(1);
-            });
-
-            return $this;
-        }
-
         $this->query->orderBy($field, $direction);
 
         return $this;

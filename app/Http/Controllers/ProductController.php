@@ -13,6 +13,7 @@ use App\Domain\Product\Services\UpdateProductService;
 use App\Domain\Product\Services\DeleteProductService;
 use App\Domain\Product\Services\ShowProductService;
 use App\Http\Requests\CreateProductRequest;
+use App\Http\Requests\ListProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Domain\Product\Http\Resources\ProductResource;
 use App\Domain\Product\Http\Resources\ProductCollection;
@@ -38,9 +39,14 @@ class ProductController extends Controller
         return new ProductResource($product);
     }
 
-    public function index(): ProductCollection
+    public function index(ListProductRequest $request): ProductCollection
     {
-        $products = $this->listProducts->execute();
+        $products = $this->listProducts->execute(
+            perPage: $request->validated('per_page'),
+            sortBy: $request->validated('sort_by'),
+            direction: $request->validated('direction'),
+            search: $request->validated('search'),
+        );
 
         return new ProductCollection($products);
     }
