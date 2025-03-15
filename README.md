@@ -1,66 +1,93 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Product Management System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A scalable Laravel-based product management system built with Domain-Driven Design principles.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Product CRUD operations with categories
+- Rating system (0-100)
+- Recently viewed products tracking with Redis
+- Related products functionality
+- Efficient caching system
+- Handles large-scale data (100M+ products)
+- API-first design
+- Domain-Driven Design architecture
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Tech Stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP 8.2
+- Laravel 10
+- MySQL
+- Redis
+- Docker (Laravel Sail)
+- PHPUnit for testing
+- Psalm for static analysis
 
-## Learning Laravel
+## Requirements
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- Docker
+- Docker Compose
+- Make
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## Available Commands
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Container Management
+- `make up` - Start the application containers
+- `make down` - Stop the application containers
+- `make restart` - Restart the application containers
+- `make build` - Rebuild the application containers
+- `make shell` - Access the application container shell
 
-## Laravel Sponsors
+### Database Commands
+- `make migrate` - Run database migrations
+- `make fresh` - Drop all tables and re-run migrations
+- `make seed` - Run database seeders
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Development Commands
+- `make npm-install` - Install NPM dependencies
+- `make npm-dev` - Run NPM dev script
+- `make npm-build` - Run NPM build script
+- `make composer-install` - Install Composer dependencies
+- `make composer-update` - Update Composer dependencies
+- `make dev` - Run NPM dev script
+- `make prod` - Run NPM build script
+- `make watch` - Run Vite in watch mode for development
 
-### Premium Partners
+### Testing Commands
+- `make test` - Run all tests
+- `make test-unit` - Run only unit tests
+- `make test-feature` - Run only feature tests
+- `make test-filter filter=TestName` - Run specific test file or method
+- `make test-coverage` - Run tests with coverage report
+- `make test-parallel` - Run tests in parallel
+- `make test-stop` - Run tests and stop on first failure
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+### Static Analysis
+- `make psalm` - Run Psalm static analysis
+- `make psalm-dry` - Run Psalm without making changes
+- `make psalm-fix` - Run Psalm with automatic fixes
 
-## Contributing
+## Project Structure
+```
+app/
+├── Domain/
+│ └── Product/
+│ ├── Models/ # Domain models
+│ ├── Services/ # Business logic services
+│ ├── DTOs/ # Data Transfer Objects
+│ ├── Repositories/ # Data access layer
+│ ├── Events/ # Domain events
+│ └── Validators/ # Domain validation
+├── Http/
+│ └── Controllers/ # API Controllers
+└── Infrastructure/
+└── Database/ # Database related code
+```
+## API Endpoints
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Products
+- `GET /api/v1/products` - List products (paginated)
+- `POST /api/v1/products` - Create new product
+- `PUT /api/v1/products/{id}` - Update product
+- `DELETE /api/v1/products/{id}` - Delete product
+- `GET /api/v1/products/{id}` - Show product details

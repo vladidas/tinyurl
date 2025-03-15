@@ -26,6 +26,12 @@ export default defineConfig({
         },
         watch: {
             usePolling: true,
+            include: [
+                'resources/**',
+                'routes/**',
+                'config/**',
+                'app/**'
+            ]
         }
     }
 });
