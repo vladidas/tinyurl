@@ -26,6 +26,7 @@ class ProductResource extends JsonResource
             Product::NAME => $this[Product::NAME],
             Product::DESCRIPTION => $this[Product::DESCRIPTION],
             Product::PRICE => $this[Product::PRICE],
+            Product::RATING => $this[Product::RATING],
             Product::CREATED_AT => $this[Product::CREATED_AT],
             Product::UPDATED_AT => $this[Product::UPDATED_AT],
         ];
