@@ -19,9 +19,12 @@ A scalable Laravel-based product management system built with Domain-Driven Desi
 - Laravel 10
 - MySQL
 - Redis
+- ElasticSearch
 - Docker (Laravel Sail)
 - PHPUnit for testing
 - Psalm for static analysis
+- Kibana
+- Telescope
 
 ## Requirements
 
