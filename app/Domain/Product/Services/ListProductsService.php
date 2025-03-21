@@ -6,12 +6,13 @@ namespace App\Domain\Product\Services;
 
 use App\Domain\Product\Models\Product;
 use App\Domain\Product\Repositories\ProductRepository;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 final readonly class ListProductsService
 {
     public function __construct(
-        private ProductRepository $repository
+        private ProductRepository $repository,
+        private ProductSearchService $searchService
     ) {}
 
     public function execute(
@@ -21,6 +22,10 @@ final readonly class ListProductsService
         string $direction = 'desc',
         ?string $search = null
     ): LengthAwarePaginator {
-        return $this->repository->paginate($page, $perPage, $sortBy, $direction, $search);
+        if ($search) {
+            return $this->searchService->searchAndPaginate($search, $page, $perPage);
+        }
+
+        return $this->repository->paginate($page, $perPage, $sortBy, $direction);
     }
 }

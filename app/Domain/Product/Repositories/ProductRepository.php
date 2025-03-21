@@ -11,6 +11,7 @@ use App\Domain\Product\QueryBuilders\ProductQueryBuilder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Database\Eloquent\Builder;
 
 class ProductRepository
 {
@@ -34,30 +35,48 @@ class ProductRepository
     }
 
     public function paginate(
-        int $page = 1,
-        int $perPage = 15,
-        string $sortBy = Product::CREATED_AT,
-        string $direction = 'desc',
-        ?string $search = null,
-        bool $cacheResults = true
+        int $page,
+        int $perPage,
+        string $sortBy,
+        string $direction,
+        ?string $search = null
     ): LengthAwarePaginator {
-        $key = "products:list:{$sortBy}:{$direction}:{$search}:{$perPage}:{$page}";
+        return $this->getBaseQuery($search)
+            ->orderBy($sortBy, $direction)
+            ->paginate(perPage: $perPage, page: $page);
+    }
 
-        $cached = Redis::get($key);
-        if ($cacheResults && $cached) {
-            return unserialize($cached);
+    public function paginateByIds(array $ids, int $perPage, int $page): LengthAwarePaginator
+    {
+        if (empty($ids)) {
+            return $this->paginateEmpty($perPage, $page);
         }
 
-        $paginator = $this->queryBuilder
-            ->onlyActive()
-            ->withCategories()
-            ->search($search)
-            ->sortBy($sortBy, $direction)
-            ->paginate($perPage);
+        return Product::query()
+            ->whereIn(Product::ID, $ids)
+            ->orderByRaw('FIELD(id, ' . implode(',', $ids) . ')')
+            ->paginate(perPage: $perPage, page: $page);
+    }
 
-        Redis::setex($key, self::CACHE_TTL, serialize($paginator));
+    public function paginateEmpty(int $perPage, int $page): LengthAwarePaginator
+    {
+        return Product::query()
+            ->whereRaw('1 = 0')
+            ->paginate(perPage: $perPage, page: $page);
+    }
 
-        return $paginator;
+    private function getBaseQuery(?string $search = null): Builder
+    {
+        $query = Product::query();
+
+        if ($search) {
+            $query->where(function (Builder $query) use ($search) {
+                $query->where(Product::NAME, 'like', "%{$search}%")
+                    ->orWhere(Product::DESCRIPTION, 'like', "%{$search}%");
+            });
+        }
+
+        return $query;
     }
 
     public function findById(int $id): ?Product

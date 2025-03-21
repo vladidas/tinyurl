@@ -15,4 +15,4 @@ class ProductSeeder extends Seeder
             ->count(100)
             ->create();
     }
-} 
+}

@@ -2,9 +2,6 @@
 
 A scalable Laravel-based product management system built with Domain-Driven Design principles.
 
-## TODO:
-- ADD ELASTICSEARCH for optimization
-
 ## Features
 
 - Product CRUD operations with categories
